@@ -1,0 +1,87 @@
+const getTotalCriteriaCount = () => {
+        if (!evaluationCriteria) return 0;
+        return Object.values(evaluationCriteria).reduce(
+            (total, section) => total + section.criteria.length,
+            0
+        );
+    };
+
+    // Helper function to check if all criteria are rated
+    const areAllCriteriaRated = () => {
+        const totalCriteria = getTotalCriteriaCount();
+        const ratedCriteria = Object.keys(evaluationRatings).length;
+        return totalCriteria > 0 && ratedCriteria === totalCriteria;
+    };
+
+       const handleSubmitEvaluation = async () => {
+        if (!userWalletAddress) {
+            openNotificationWithIcon(
+                "error",
+                "Wallet Not Connected",
+                "Please connect your wallet to submit an evaluation.",
+                3
+            );
+            return;
+        }
+
+        const totalCriteria = getTotalCriteriaCount();
+        const ratedCriteria = Object.keys(evaluationRatings).length;
+
+        if (ratedCriteria === 0) {
+            openNotificationWithIcon(
+                "error",
+                "No Ratings Provided",
+                "Please rate at least one criterion before submitting.",
+                3
+            );
+            return;
+        }
+
+        if (ratedCriteria < totalCriteria) {
+            openNotificationWithIcon(
+                "error",
+                "Incomplete Evaluation",
+                `Please rate all criteria before submitting. You have rated ${ratedCriteria} out of ${totalCriteria} criteria.`,
+                4
+            );
+            return;
+        }
+
+        setIsSubmitting(true);
+
+        try {
+            // Calculate average rating
+            const ratings = Object.values(evaluationRatings);
+            const averageRating =
+                ratings.reduce((sum, rating) => sum + rating, 0) /
+                ratings.length;
+
+            // Submit evaluation and vote
+            await setOneOERVoteFromEthereum(
+                unwrappedParams.slug,
+                Math.round(averageRating)
+            );
+
+            openNotificationWithIcon(
+                "success",
+                "Evaluation Submitted",
+                `Your evaluation has been submitted successfully! Average rating: ${averageRating.toFixed(
+                    1
+                )}/5`,
+                3
+            );
+
+            // Navigate back to the OER detail page
+            router.push(`/oer/${unwrappedParams.slug}`);
+        } catch (error) {
+            console.error("Error submitting evaluation:", error);
+            openNotificationWithIcon(
+                "error",
+                "Submission Failed",
+                "Failed to submit your evaluation. Please try again.",
+                3
+            );
+        } finally {
+            setIsSubmitting(false);
+        }
+    };
