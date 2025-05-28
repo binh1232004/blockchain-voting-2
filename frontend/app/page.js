@@ -14,7 +14,7 @@ export default function Home() {
   useEffect(() => {
     if(!isLoading)
       setDecreasedOERFromEthereum();
-  }, [isLoading, setDecreasedOERFromEthereum]);
+  }, [isLoading]);
   
   useEffect(() => {
   }, [OERDecreasedOnVote]);
