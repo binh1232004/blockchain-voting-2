@@ -179,3 +179,8 @@ export const parseMarkdownCriteria = (markdown) => {
 
         return sections;
     };
+export const parseWeiIntoOERT = (weiValue) => {
+    const voteInOERT = parseFloat(weiValue.toString()) / Math.pow(10, 18);
+    const formattedVote = parseFloat(voteInOERT.toFixed(2)); // Round to 2 decimal
+    return Number(formattedVote);
+}

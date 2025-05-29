@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import useEthers from "./useEthers";
 import useSWRCustom from "./useSWRCustom";
 import { compareFnToGetDecreaseVote } from "../utils";
+import { parseWeiIntoOERT } from "../utils";
 
 /**
  * 
@@ -27,10 +28,10 @@ export default function useOERVote(oerId, oer){
             console.log('OER ID:', oerId);
             
             // Use getOerVotesInOERT to get votes in OERT units instead of wei
-            const voteForOER = await votingContract.getOerVotesInOERT(oerId);
-            console.log('Raw vote result (in OERT):', voteForOER);
+            const voteForOERInWei = await votingContract.getOerVotes(oerId); // or getOerVotesInOERT if it returns wei
+            const voteForOERInOERT = parseWeiIntoOERT(voteForOERInWei);
             
-            setOneOERVote(Number(voteForOER));
+            setOneOERVote(voteForOERInOERT);
         } catch (error) {
             console.error('Error fetching OER vote:', error);
             setOneOERVote(0);
@@ -48,7 +49,8 @@ export default function useOERVote(oerId, oer){
             const votingContract = getReadOnlyVotingContract();
             // Use getOerVotesInOERT to get votes in OERT units instead of wei
             const vote = await votingContract.getOerVotesInOERT(OERId);
-            oerCopy[i].vote = Number(vote);
+
+            oerCopy[i].vote = parseWeiIntoOERT(vote);
         }
         oerCopy.sort(compareFnToGetDecreaseVote);
         setOERDecreasedOnVote(oerCopy);

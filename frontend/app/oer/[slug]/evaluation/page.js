@@ -30,7 +30,9 @@ export default function EvaluationPage({ params }) {
     useEffect(() => {
         setMounted(true);
     }, []);
-
+    useEffect(() => {
+        console.log("Total tokens for evaluation:", totalTokens);
+    }, [totalTokens]);
     // Update total tokens whenever ratings change
     useEffect(() => {
         if (Object.keys(evaluationRatings).length > 0) {
@@ -233,7 +235,7 @@ export default function EvaluationPage({ params }) {
 
             // Submit evaluation to traditional voting system
             await setOneOERVoteFromEthereum(
-                unwrappedParams.slug,
+                detailOer.id,
                 Math.round(averageRating)
             );
 

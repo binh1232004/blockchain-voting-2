@@ -30,7 +30,6 @@ contract OERVoting {
         oerPerUserVotes[oerId][msg.sender] += tokenAmount;
         // oerTotalVotes[oerId] += tokenAmount / (10 ** DECIMALS);
         // In wei 
-        console.log("Vote token amount: ", tokenAmount);
         oerTotalVotes[oerId] += tokenAmount;
     }
 
@@ -42,6 +41,6 @@ contract OERVoting {
         return oerTotalVotes[oerId] > 0;
     }
     function getOerVotesInOERT(uint256 oerId) external view returns (uint256) {
-        return oerTotalVotes[oerId] / (10 ** DECIMALS);
+        return oerTotalVotes[oerId] ;
     }
 }
