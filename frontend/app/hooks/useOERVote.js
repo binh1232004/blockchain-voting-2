@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import useEthers from "./useEthers";
 import useSWRCustom from "./useSWRCustom";
 import { compareFnToGetDecreaseVote } from "../utils";
@@ -15,11 +15,13 @@ export default function useOERVote(oerId, oer){
     const {getReadOnlyVotingContract} = useEthers();
     const [oneOERVote, setOneOERVote] = useState(0);
     const [OERDecreasedOnVote, setOERDecreasedOnVote] = useState([]);
+    
     /**
      * 
      * @param {number} oerId 
      * @returns {Promise<number>} vote for one oer
-     */    const setOneOERVoteFromEthereum = async () => {
+     */
+    const setOneOERVoteFromEthereum = useCallback(async () => {
         try {
             const votingContract = getReadOnlyVotingContract();
             
@@ -36,7 +38,7 @@ export default function useOERVote(oerId, oer){
             console.error('Error fetching OER vote:', error);
             setOneOERVote(0);
         }
-    };
+    }, [getReadOnlyVotingContract, oerId]);
 
     const setDecreasedOERFromEthereum = async () => {
         if(!oer)
@@ -54,15 +56,7 @@ export default function useOERVote(oerId, oer){
         }
         oerCopy.sort(compareFnToGetDecreaseVote);
         setOERDecreasedOnVote(oerCopy);
-    };    const testContractCall = async () => {
-        try {
-            const votingContract = getReadOnlyVotingContract();
-            const result = await votingContract.getOerVotesInOERT(1);
-            console.log('Test contract call result (in OERT):', result);
-        } catch (error) {
-            console.error('Error in testContractCall:', error);
-        }
-    };
+    };   
     return {
         setOneOERVoteFromEthereum,
         oneOERVote,
